@@ -2,6 +2,10 @@
 
 # Famaf-Resources-Manager
 
+In this repository we hold the shared workflows of the Famaf-Resources organization, and have automatic updates so they can be easily updated.
+
+Every time this repo is updated, a dispatch action is issued and all the repos that are listed in the `.github/workflows/dipatch.yml` file are notified by trigger and updated.
+
 ## Features
 
 - [x] Update to child repositories from parent (submodule)
