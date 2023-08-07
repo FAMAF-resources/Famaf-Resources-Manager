@@ -1,0 +1,47 @@
+name: 'Dispatch to Repository Action'
+# on: [push, workflow_dispatch]
+on: [workflow_dispatch]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repositories: [
+          # 'FAMAF-resources/childRepository',
+          'FAMAF-resources/Template-repository',
+          'FAMAF-resources/Modulo_de_ingles-FAMAF',
+          'FAMAF-resources/Matematica_Discreta_I-FAMAF',
+          'FAMAF-resources/1ro_1C-Introduccion_a_los_Algoritmos-FAMAF',
+          'FAMAF-resources/1ro_1C-Introduccion_a_los_Algoritmos-FAMAF',
+          'FAMAF-resources/Analisis_Matematico_I-FAMAF',
+          'FAMAF-resources/Algoritmos_y_estructura_de_datos_I-FAMAF',
+          'FAMAF-resources/Analisis_Matematico_II-FAMAF',
+          'FAMAF-resources/Algoritmos_y_estructura_de_datos_II-FAMAF',
+          'FAMAF-resources/2do_1C-Organizacion_del_Computador-FAMAF',
+          'FAMAF-resources/2do_1C-Analisis_Numerico_I-FAMAF',
+          'FAMAF-resources/2_2C-Introduccion_a_la_Logica_y_la_computacion-FAMAF',
+          'FAMAF-resources/2do_2C-Sistemas_Operativos-FAMAF',
+          'FAMAF-resources/2do_2C-Probabilidad_y_Estadistica-FAMAF',
+          'FAMAF-resources/3ro_1C-Matematica_Discreta_II-FAMAF',
+          'FAMAF-resources/3ro_1C-Paradigmas_de_la_Programacion-FAMAF',
+          'FAMAF-resources/3ro_1C-Redes_y_Sistemas_Distribuidos-FAMAF',
+          'FAMAF-resources/3ro_2C-Ingenieria_del_Software_I-FAMAF',
+          'FAMAF-resources/3ro_2C-Bases_de_Datos-FAMAF',
+          'FAMAF-resources/3ro_2C-Arquitectura_de_Computadoras-FAMAF',
+          'FAMAF-resources/4to_1C-LenguajesFormales_y_Computabilidad-FAMAF',
+          'FAMAF-resources/4to_1C-Modelos_y_Simulacion-FAMAF',
+          'FAMAF-resources/4to_2C-Logica-FAMAF',
+          'FAMAF-resources/4to_2C-Fisica-FAMAF',
+          'FAMAF-resources/5to_1C-Lenguajes_y_Compiladores-FAMAF',
+          'FAMAF-resources/5to_1C-Ingenieria_del_Software_II-FAMAF'
+        ]
+    steps:
+      - name: Push to repo
+        uses: peter-evans/repository-dispatch@v2.1.1
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          repository: ${{ matrix.repositories }}
+          event-type: update-submodules-famaf
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "owner/submodule", "branch": "main"}'
+
