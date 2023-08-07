@@ -8,5 +8,5 @@ echo -e 'Running parent update files script'
 echo -e 'Creating .github/ folder\n'
 mkdir -p .github/
 echo -e 'Updating workflows...\n'
-cp -r parentRepository/child.github/* .github/
+cp -r Famaf-Resources-Manager/child.github/* .github/
 echo -e '\nUpdate complete'
