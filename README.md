@@ -11,6 +11,7 @@ Every time this repo is updated, a dispatch action is issued and all the repos t
 - [x] Update to child repositories from parent (submodule)
 - [x] Labeler
 - [x] Auto assign PR
+- [x] Greetings on PR's and issues
 
 ## License
 
