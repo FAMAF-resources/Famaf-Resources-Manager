@@ -9,15 +9,15 @@ jobs:
         repositories: [
           'FAMAF-resources/Template-repository',
           'FAMAF-resources/Modulo_de_ingles-FAMAF',
-          'FAMAF-resources/Matematica_Discreta_I-FAMAF',
+          'FAMAF-resources/1ro_1C-Matematica_Discreta_I-FAMAF',
           'FAMAF-resources/1ro_1C-Introduccion_a_los_Algoritmos-FAMAF',
-          'FAMAF-resources/Analisis_Matematico_I-FAMAF',
-          'FAMAF-resources/Algoritmos_y_estructura_de_datos_I-FAMAF',
-          'FAMAF-resources/Analisis_Matematico_II-FAMAF',
-          'FAMAF-resources/Algoritmos_y_estructura_de_datos_II-FAMAF',
+          'FAMAF-resources/1ro_1C-Analisis_Matematico_I-FAMAF',
+          'FAMAF-resources/1ro_2C-Algoritmos_y_estructura_de_datos_I-FAMAF',
+          'FAMAF-resources/1ro_2C-Analisis_Matematico_II-FAMAF',
+          'FAMAF-resources/2do_2C-Algoritmos_y_estructura_de_datos_II-FAMAF',
           'FAMAF-resources/2do_1C-Organizacion_del_Computador-FAMAF',
           'FAMAF-resources/2do_1C-Analisis_Numerico_I-FAMAF',
-          'FAMAF-resources/2_2C-Introduccion_a_la_Logica_y_la_computacion-FAMAF',
+          'FAMAF-resources/2do_2C-Introduccion_a_la_Logica_y_la_computacion-FAMAF',
           'FAMAF-resources/2do_2C-Sistemas_Operativos-FAMAF',
           'FAMAF-resources/2do_2C-Probabilidad_y_Estadistica-FAMAF',
           'FAMAF-resources/3ro_1C-Matematica_Discreta_II-FAMAF',
@@ -31,7 +31,9 @@ jobs:
           'FAMAF-resources/4to_2C-Logica-FAMAF',
           'FAMAF-resources/4to_2C-Fisica-FAMAF',
           'FAMAF-resources/5to_1C-Lenguajes_y_Compiladores-FAMAF',
-          'FAMAF-resources/5to_1C-Ingenieria_del_Software_II-FAMAF'
+          'FAMAF-resources/5to_1C-Ingenieria_del_Software_II-FAMAF',
+          'FAMAF-resources/Optativa-Redes_Neuronales-FAMAF',
+          'FAMAF-resources/Optativa-Computacion_Paralela-FAMAF'
         ]
     steps:
       - name: Push to repo
