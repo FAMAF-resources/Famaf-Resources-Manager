@@ -37,7 +37,18 @@ jobs:
           'FAMAF-resources/5to_1C-Lenguajes_y_Compiladores-FAMAF',
           'FAMAF-resources/5to_1C-Ingenieria_del_Software_II-FAMAF',
           'FAMAF-resources/Optativa-Redes_Neuronales-FAMAF',
-          'FAMAF-resources/Optativa-Computacion_Paralela-FAMAF'
+          'FAMAF-resources/Optativa-Computacion_Paralela-FAMAF',
+          'FAMAF-resources/Template-Examenes',
+          'FAMAF-resources/LMA-1ro_1C-Algoritmos_y_Programacion-FAMAF',
+          'FAMAF-resources/LMA-1ro_2C-Fisica_I-FAMAF',
+          'FAMAF-resources/LMA-2do_1C-Calculo_Vectorial-FAMAF',
+          'FAMAF-resources/LMA-2do_1C-Fisica_II-FAMAF',
+          'FAMAF-resources/LMA_LM-2do_2C-Analisis_Numerico_II-FAMAF',
+          'FAMAF-resources/LMA-2do_2C-Funciones_Complejas-FAMAF',
+          'FAMAF-resources/LMA-3ro_2C-Analisis_Numerico_III-FAMAF',
+          'FAMAF-resources/LMA-4to_1C-Ciencia_de_datos-FAMAF',
+          'FAMAF-resources/LMA-4to_1C-Investigacion_de_Operaciones-FAMAF',
+          'FAMAF-resources/LMA-5to_1C-Modelos_de_Programacion-FAMAF'
         ]
     steps:
       - name: Push to repo
