@@ -12,15 +12,18 @@ jobs:
       matrix:
         repositories: [
           'FAMAF-resources/Template-repository',
+          'FAMAF-resources/0-Ingreso-FAMAF',
           'FAMAF-resources/Modulo_de_ingles-FAMAF',
+          'FAMAF-resources/LCC_Materias-FAMAF',
           'FAMAF-resources/1ro_1C-Matematica_Discreta_I-FAMAF',
           'FAMAF-resources/1ro_1C-Introduccion_a_los_Algoritmos-FAMAF',
           'FAMAF-resources/1ro_1C-Analisis_Matematico_I-FAMAF',
           'FAMAF-resources/1ro_2C-Algoritmos_y_estructura_de_datos_I-FAMAF',
           'FAMAF-resources/1ro_2C-Analisis_Matematico_II-FAMAF',
-          'FAMAF-resources/2do_2C-Algoritmos_y_estructura_de_datos_II-FAMAF',
+          'FAMAF-resources/1ro_2C-Algebra-FAMAF',
           'FAMAF-resources/2do_1C-Organizacion_del_Computador-FAMAF',
           'FAMAF-resources/2do_1C-Analisis_Numerico_I-FAMAF',
+          'FAMAF-resources/2do_2C-Algoritmos_y_estructura_de_datos_II-FAMAF',
           'FAMAF-resources/2do_2C-Introduccion_a_la_Logica_y_la_computacion-FAMAF',
           'FAMAF-resources/2do_2C-Sistemas_Operativos-FAMAF',
           'FAMAF-resources/2do_2C-Probabilidad_y_Estadistica-FAMAF',
@@ -38,21 +41,28 @@ jobs:
           'FAMAF-resources/5to_1C-Ingenieria_del_Software_II-FAMAF',
           'FAMAF-resources/Optativa-Redes_Neuronales-FAMAF',
           'FAMAF-resources/Optativa-Computacion_Paralela-FAMAF',
-          'FAMAF-resources/Template-Examenes',
+          'FAMAF-resources/LMA_Materias-FAMAF',
+          'FAMAF-resources/LMA_ExamenesViejos-FAMAF',
           'FAMAF-resources/LMA-1ro_1C-Algoritmos_y_Programacion-FAMAF',
           'FAMAF-resources/LMA-1ro_2C-Fisica_I-FAMAF',
-          'FAMAF-resources/LMA-2do_1C-Calculo_Vectorial-FAMAF',
           'FAMAF-resources/LMA-2do_1C-Fisica_II-FAMAF',
-          'FAMAF-resources/LMA_LM-2do_2C-Analisis_Numerico_II-FAMAF',
+          'FAMAF-resources/LMA-2do_1C-Calculo_Vectorial-FAMAF',
           'FAMAF-resources/LMA-2do_2C-Funciones_Complejas-FAMAF',
+          'FAMAF-resources/LMA_LM-2do_2C-Analisis_Numerico_II-FAMAF',
+          'FAMAF-resources/LMA-3ro_1C-Ecuaciones_Diferenciales_I-FAMAF',
           'FAMAF-resources/LMA-3ro_2C-Analisis_Numerico_III-FAMAF',
+          'FAMAF-resources/LMA-3ro_2C-Matematica_Financiera-FAMAF',
+          'FAMAF-resources/LMA-3ro_2C-Ecuaciones_Diferenciales_II-FAMAF',
           'FAMAF-resources/LMA-4to_1C-Ciencia_de_datos-FAMAF',
-          'FAMAF-resources/LMA-4to_1C-Investigacion_de_Operaciones-FAMAF',
-          'FAMAF-resources/LMA-5to_1C-Modelos_de_Programacion-FAMAF'
+          'FAMAF-resources/LMA-4to_2C-Sistemas_de_Control-FAMAF',
+          'FAMAF-resources/LMA-5to_1C-Modelos_de_Programacion-FAMAF',
+          'FAMAF-resources/LM_Materias-FAMAF',
+          'FAMAF-resources/LM_ExamenesViejos-FAMAF',
+          'FAMAF-resources/Template-Examenes'
         ]
     steps:
       - name: Push to repo
-        uses: peter-evans/repository-dispatch@v2.1.1
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           repository: ${{ matrix.repositories }}

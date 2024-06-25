@@ -1,6 +1,6 @@
 name: 'Greetings :D'
 
-on: [pull_request_target, issues]
+on: [pull_request, issues]
 
 jobs:
   greeting:
