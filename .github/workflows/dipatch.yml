@@ -61,11 +61,17 @@ jobs:
           'FAMAF-resources/Template-Examenes'
         ]
     steps:
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.FRM_APP_ID }}
+          private-key: ${{ secrets.FRM_APP_PRIVATE_KEY }}
+
       - name: Push to repo
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
+          token: ${{ steps.generate_token.outputs.token }}
           repository: ${{ matrix.repositories }}
           event-type: update-submodules-famaf
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "owner/submodule", "branch": "main"}'
-
