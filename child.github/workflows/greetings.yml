@@ -9,8 +9,16 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - uses: actions/first-interaction@v1.1.1
-      with:
-        repo-token: ${{ secrets.WORKFLOW_TOKEN }}
-        issue-message: "Muchas gracias por crear un issue! Lo apreciamos :dizzy:"
-        pr-message: "Muchas gracias por aportar en nuestra comunidad! :people_hugging: Puedes ver mas al respecto en [Welcome](https://github.com/FAMAF-resources/.github/tree/main/profile/README.md) y las materias en [](https://github.com/FAMAF-resources/Welcome)"
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: First interaction
+        uses: actions/first-interaction@v1.1.1
+        with:
+          repo-token: ${{ steps.generate_token.outputs.token }}
+          issue-message: "Muchas gracias por crear un issue! Lo apreciamos :dizzy:"
+          pr-message: "Muchas gracias por aportar en nuestra comunidad! :people_hugging: Puedes ver mas al respecto en [Welcome](https://github.com/FAMAF-resources/.github/tree/main/profile/README.md) y las materias en [Recursos FAMAF](https://github.com/FAMAF-resources/Welcome)"
