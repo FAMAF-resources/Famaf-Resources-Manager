@@ -5,34 +5,63 @@ on:
       - main
   # workflow_dispatch
 
+permissions: {}
+
+concurrency:
+  group: dispatch
+  cancel-in-progress: false
+
 jobs:
+  repositories:
+    name: Read child repositories
+    # Forks do not have the GitHub App secrets, so the job would only fail there.
+    if: github.repository == 'FAMAF-resources/Famaf-Resources-Manager'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      list: ${{ steps.read.outputs.list }}
+    steps:
+      - name: Checkout repositories.json
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          sparse-checkout: .github/workflows/repositories.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Read list
+        id: read
+        run: echo "list=$(jq -c '."child-repos"' .github/workflows/repositories.json)" >> "$GITHUB_OUTPUT"
+
   dispatch:
+    name: Dispatch to ${{ matrix.repository }}
+    needs: repositories
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        repositories: [
-          'FAMAF-resources/Template-repository'
-        ]
+        repository: ${{ fromJSON(needs.repositories.outputs.list) }}
     steps:
+      - name: Get repository name
+        id: repo
+        env:
+          REPOSITORY: ${{ matrix.repository }}
+        run: echo "name=${REPOSITORY#*/}" >> "$GITHUB_OUTPUT"
+
       - name: Generate GitHub App Token
         id: generate_token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         with:
           app-id: ${{ secrets.FRM_APP_ID }}
           private-key: ${{ secrets.FRM_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-
-      - name: Debug Token Scope
-        run: |
-          echo "Listing repositories accessible by this token:"
-          curl -X GET -H "Authorization: Bearer ${{ steps.generate_token.outputs.token }}" \
-              -H "Accept: application/vnd.github+json" \
-              https://api.github.com/installation/repositories | jq '.repositories[].full_name'
+          repositories: ${{ steps.repo.outputs.name }}
+          permission-contents: write
 
       - name: Push to repo
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
         with:
           token: ${{ steps.generate_token.outputs.token }}
-          repository: ${{ matrix.repositories }}
+          repository: ${{ matrix.repository }}
           event-type: update-submodules-famaf
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "module": "owner/submodule", "branch": "main"}'

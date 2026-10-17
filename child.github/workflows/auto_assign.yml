@@ -1,26 +1,22 @@
 name: 'Auto Assign Action'
 
 on:
-  pull_request:
+  # Safe: the job never checks out or runs code from the PR. The configuration
+  # is read from the base branch and the action only calls the API.
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
     types: [opened, ready_for_review, labeled, unlabeled]
+
+permissions: {}
 
 jobs:
   add-reviews:
     runs-on: ubuntu-latest
-    steps:
-      - name: Generate GitHub App Token
-        id: generate_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - name: Auto Assign
-        uses: kentaro-m/auto-assign-action@v2.0.0
-        with:
-          configuration-path: '.github/list_auto_assign.yml'
-          repo-token: ${{ steps.generate_token.outputs.token }}
-
     permissions:
       contents: read
       pull-requests: write
+    steps:
+      - name: Auto Assign
+        uses: kentaro-m/auto-assign-action@f4648c0a9fdb753479e9e75fc251f507ce17bb7e # v2.0.0
+        with:
+          configuration-path: '.github/list_auto_assign.yml'
+          repo-token: ${{ github.token }}

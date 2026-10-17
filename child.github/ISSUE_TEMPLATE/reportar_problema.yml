@@ -1,0 +1,32 @@
+name: Reportar un problema
+description: Archivo incorrecto, enlace roto, error en un recurso o contenido que no debería estar.
+title: "[Problema] "
+body:
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: ¿Qué tipo de problema es?
+      options:
+        - Enlace roto
+        - Archivo incorrecto o ilegible
+        - Error en el contenido
+        - Material en una carpeta equivocada
+        - Contenido que no debería estar publicado
+        - Otro
+    validations:
+      required: true
+  - type: input
+    id: ubicacion
+    attributes:
+      label: Archivo o ubicación
+      description: Ruta del archivo o enlace a la página donde lo viste.
+      placeholder: "Ej: apuntes/analisis_1_resumen.pdf"
+    validations:
+      required: true
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción
+      description: Cuéntanos qué pasa y, si sabes cómo, cómo se podría arreglar.
+    validations:
+      required: true

@@ -8,53 +8,70 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
-env:
-  SHOULD_COMMIT: ''
+permissions: {}
+
+concurrency:
+  group: update-submodules
+  cancel-in-progress: false
 
 jobs:
   famaftestupdate:
     name: Update submodules
+    # Forks do not have the GitHub App secrets, so the job would only fail there.
+    if: github.repository_owner == 'FAMAF-resources' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App Token
         id: generate_token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1.12.0
         with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.UPDATER_APP_ID }}
+          private-key: ${{ secrets.UPDATER_APP_PRIVATE_KEY }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          # Needed to push changes under .github/workflows
+          permission-workflows: write
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           token: ${{ steps.generate_token.outputs.token }}
           submodules: recursive
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Update submodules
         run: git submodule update --init --recursive --checkout -f --remote
 
-      - name: Update status
+      - name: Check changes
         id: status
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
-            echo "SHOULD_COMMIT=true" >> $GITHUB_ENV
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "SHOULD_COMMIT=false" >> $GITHUB_ENV
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Config git and Push
-        if: ${{ env.SHOULD_COMMIT == 'true' }}
-        run: |
-          git config --global user.name "${{ steps.generate_token.outputs.app-slug }}[bot]"
-          git config --global user.email "${{ steps.generate_token.outputs.app-user-id }}+${{ steps.generate_token.outputs.app-slug }}[bot]@users.noreply.github.com"
+      # Runs a script that comes from the parent repository, so this step has no
+      # token in its environment and none is stored in the checkout.
+      - name: Sync workflows from parent
+        if: steps.status.outputs.changed == 'true'
+        run: bash ./Famaf-Resources-Manager/scripts/update_w_from_parent.sh
 
-          # Ejecutar tu script de actualización
-          source ./Famaf-Resources-Manager/scripts/update_w_from_parent.sh
+      - name: Commit and push
+        if: steps.status.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+          APP_SLUG: ${{ steps.generate_token.outputs.app-slug }}
+        run: |
+          user_id="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${user_id}+${APP_SLUG}[bot]@users.noreply.github.com"
 
           git add .
           git commit -m "[BOT] Update submodules at $(date "+%Y-%m-%d %H:%M:%S")"
-          git push
+
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic ${auth}" push
