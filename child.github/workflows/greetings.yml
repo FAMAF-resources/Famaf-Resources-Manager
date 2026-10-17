@@ -1,26 +1,25 @@
 name: 'Greetings :D'
 
 on:
-  pull_request:
+  # Safe: the job never checks out or runs code from the PR. It only comments.
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
     types: [opened]
   issues:
     types: [opened]
 
+permissions: {}
+
 jobs:
   greeting:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
-      - name: Generate GitHub App Token
-        id: generate_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
       - name: Primera interacción
-        uses: actions/first-interaction@v1.3.0
+        uses: actions/first-interaction@34f15e814fe48ac9312ccf29db4e74fa767cbab7 # v1.3.0
         with:
-          repo-token: ${{ steps.generate_token.outputs.token }}
+          repo-token: ${{ github.token }}
           issue-message: |
             ## ¡Hola! Gracias por tu interés en Recursos FAMAF 🚀
 

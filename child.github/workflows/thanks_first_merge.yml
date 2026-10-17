@@ -1,0 +1,46 @@
+name: 'Thanks First Merged PR'
+
+on:
+  # pull_request_target gives a token that can comment on PRs from forks.
+  # This workflow never checks out or runs code from the PR.
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  thanks:
+    name: Thank first-time contributors
+    if: github.event.pull_request.merged == true && github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment if it is the first merged PR of the author
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          merged_count="$(gh api -X GET search/issues \
+            -f q="repo:${REPO} is:pr is:merged author:${AUTHOR}" \
+            --jq .total_count)"
+
+          # The search index may not include this PR yet, so 0 also counts as first.
+          if (( merged_count > 1 )); then
+            echo "${AUTHOR} already has merged PRs, nothing to do."
+            exit 0
+          fi
+
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$(cat <<EOF
+          ## ¡Gracias por tu primer aporte, @${AUTHOR}! 🎉
+
+          Tu pull request ya fue incorporado a **Recursos FAMAF**. Gracias a personas como tú, más estudiantes tienen acceso a mejores materiales. :sparkles:
+
+          **Y ahora, ¿qué sigue?**
+          - Puedes seguir sumando contenido o corregir lo que veas mejorable.
+          - Revisa la [guía de contribución](https://github.com/${REPO}/blob/HEAD/.github/CONTRIBUTING.md) para conocer el formato del repositorio.
+          - Cuéntale a tus compañeros que cualquiera puede aportar. :people_hugging:
+          EOF
+          )"

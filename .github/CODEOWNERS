@@ -1,0 +1,7 @@
+* @shirosweets
+
+# Code that runs in every child repository
+/.github/ @shirosweets
+/child.github/ @shirosweets
+/scripts/ @shirosweets
+/.gitmodules @shirosweets

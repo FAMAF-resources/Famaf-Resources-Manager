@@ -1,0 +1,107 @@
+name: 'Lint Workflows'
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/**'
+      - 'child.github/**'
+      - 'scripts/**'
+
+permissions: {}
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ACTIONLINT_VERSION: '1.7.12'
+      ACTIONLINT_SHA256: '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Install actionlint
+        run: |
+          curl -fsSL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+          tar -xzf actionlint.tar.gz actionlint
+
+      - name: Lint workflows
+        run: ./actionlint -color .github/workflows/*.yml child.github/workflows/*.yml
+
+      - name: Lint scripts
+        run: shellcheck scripts/*.sh
+
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
+        with:
+          advanced-security: false
+          online-audits: false
+          inputs: .github/workflows child.github/workflows
+
+  repositories:
+    name: repositories.json
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Validate repositories.json
+        env:
+          FILE: .github/workflows/repositories.json
+        run: |
+          fail() { echo "::error file=${FILE}::$1"; exit 1; }
+
+          jq -e '(."child-repos" | type) == "array" and (."child-repos" | length) > 0' "$FILE" > /dev/null \
+            || fail "'child-repos' must be a non-empty array."
+
+          jq -e --arg owner "$GITHUB_REPOSITORY_OWNER" \
+            '."child-repos" | all(type == "string" and test("^" + $owner + "/[A-Za-z0-9_.-]+$"))' "$FILE" > /dev/null \
+            || fail "Every entry must look like '${GITHUB_REPOSITORY_OWNER}/repository-name'."
+
+          duplicates="$(jq -r '."child-repos" | group_by(.) | map(select(length > 1) | .[0]) | .[]' "$FILE")"
+          [ -z "$duplicates" ] || fail "Duplicated repositories: ${duplicates//$'\n'/, }"
+
+          echo "repositories.json is valid ($(jq '."child-repos" | length' "$FILE") repositories)."
+
+      - name: Check repositories exist and are not archived
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FILE: .github/workflows/repositories.json
+        run: |
+          status=0
+          while read -r repo; do
+            if ! archived="$(gh api "repos/${repo}" --jq .archived 2>/dev/null)"; then
+              echo "::error file=${FILE}::${repo} does not exist or is not accessible."; status=1
+            elif [ "$archived" = "true" ]; then
+              echo "::error file=${FILE}::${repo} is archived."; status=1
+            fi
+          done < <(jq -r '."child-repos"[]' "$FILE")
+          exit "$status"

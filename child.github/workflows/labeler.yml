@@ -1,8 +1,17 @@
 name: 'Pull Request Labeler'
 
 on:
-  pull_request:
+  # pull_request_target gives a writable token on PRs from forks. It is safe here
+  # because the job never checks out or runs code from the PR: labeler reads its
+  # configuration from the base branch and only calls the API.
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
     types: [opened, ready_for_review, labeled, unlabeled, reopened, synchronize]
+
+permissions: {}
+
+concurrency:
+  group: labeler-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   label:
@@ -11,15 +20,8 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - name: Generate GitHub App Token
-        id: generate_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
       - name: Label PR
-        uses: actions/labeler@v6
+        uses: actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d # v6.2.0
         with:
-          repo-token: ${{ steps.generate_token.outputs.token }}
+          repo-token: ${{ github.token }}
           # sync-labels: true (Opcional: elimina etiquetas si los archivos cambian)
